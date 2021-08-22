@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 START_THETA_0 = float(0)
 START_THETA_1 = float(0)
 LEARNING_RATE = float(0.0001)
-ITERATIONS = 2000
+ITERATIONS = 1000
 ERROR_LOSS_HISTORY = []
 
 ### BONUS ####
@@ -106,11 +106,11 @@ def partial_derivatives(theta_0, theta_1, m, kms, prices):
 
 
 def theta_update(theta_0, theta_1, m, kms, prices, learning_rate):
-    # Apply cost function with gradient descent algorithm
+    # Apply cost function with gradient calculation
     [derive_theta_0, derive_theta_1] = partial_derivatives(
         theta_0, theta_1, m, kms, prices
     )
-    # Update the current values of thetas
+    # Update the current values of thetas with gradient decent algorithm
     theta_0 -= derive_theta_0 / m * learning_rate
     theta_1 -= derive_theta_1 / m * learning_rate
     # End of the gradient descent algorithm
@@ -146,17 +146,16 @@ def train_model():
     except:
         print("data.csv file not found please add it to the project folder")
         sys.exit(-1)
-    kms = extract_info.iloc[0 : len(extract_info), 0]
-    prices = extract_info.iloc[0 : len(extract_info), 1]
+    kms = normalizeData(extract_info.iloc[0 : len(extract_info), 0])
+    prices = normalizeData(extract_info.iloc[0 : len(extract_info), 1])
     data_len = len(kms)
     tmp_theta_0 = START_THETA_0
     tmp_theta_1 = START_THETA_1
     print("First theta 0 to start: " + str(tmp_theta_0))
     print("First theta 1 to start: " + str(tmp_theta_1))
-    cost_monitor = []
     tmp_learning_rate = LEARNING_RATE
-    kms = normalizeData(kms)
-    prices = normalizeData(prices)
+    cost_monitor = []
+
     for i in range(0, ITERATIONS):
         [tmp_up_theta_0, tmp_up_theta_1, tmp_up_learning_rate] = theta_update(
             tmp_theta_0, tmp_theta_1, data_len, kms, prices, tmp_learning_rate
@@ -196,6 +195,11 @@ def main():
             + " and theta 1 = "
             + str(final_theta_1)
         )
+        final_thetas = {'Theta_0': [final_theta_O],
+                        'Theta_1': [final_theta_1]
+                        }
+        df_thetas = pd.DataFrame(final_thetas, columns = ['Theta_0', 'Theta_1'])
+        df_thetas.to_csv("thetas.csv", sep=",")
         want_a_prediction = query_yes_no("Do you want a new price estimation?", "yes")
         if want_a_prediction:
             sys.stdout.write("What is the mileage on the car (km)?\n")

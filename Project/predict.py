@@ -26,19 +26,31 @@ def km_predict(km, theta_0, theta_1):
     except:
         print("data.csv file not found please add it to the project folder")
         sys.exit(-1)
+    try:
+        extract_theta = pd.read_csv("thetas.csv", sep=",")
+        theta_0 = float(extract_theta["Theta_0"])
+        theta_1 = float(extract_theta["Theta_1"])
+    except:
+        print("Program was not trained.")
+        
     if float(theta_0) and float(theta_1) != 0:
-        price_prediction = (
-            theta_1 * normalize_km(extract_info["km"], float(km)) + theta_0
+        price_prediction = theta_0 + theta_1 * normalize_km(
+            extract_info["km"], float(km)
         )
         print(
             "Based on the mileage, the price estimation is\n"
-            + str("{:.2f}".format(denormalize_price(extract_info["price"], price_prediction)))
+            + str(
+                "{:.2f}".format(
+                    denormalize_price(extract_info["price"], price_prediction)
+                )
+            )
             + "$"
         )
     else:
+        price_prediction = float(theta_0) + float(theta_1) * float(km)
         print(
             "Based on the mileage, the price estimation is\n"
-            + str(float(theta_0) + (float(theta_1) * float(km)))
+            + str("{:.2f}".format(price_prediction))
             + "$"
         )
 
